@@ -1,0 +1,25 @@
+{
+  "name": "chamber_of_secrets",
+  "version": "1.0.0",
+  "description": "designed for personalised talks",
+  "main": "index.js",
+  "scripts": {
+    "start": "node backend/index.js",
+    "server": "nodemon backend/index.js",
+    "build": "npm install --legacy-peer-deps && npm install --legacy-peer-deps --prefix frontend && npm run build --prefix frontend"
+  },
+  "author": "Harsh",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-async-handler": "^1.2.0",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.0.1",
+    "nodemailer": "^6.9.14",
+    "nodemon": "^2.0.21",
+    "react": "^18.2.0",
+    "socket.io": "^4.6.1"
+  }
+}
