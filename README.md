@@ -29,7 +29,6 @@ Chamber Of Secrets provides the following functionalities:
     Real-Time Chat: Users can chat one-to-one as well as in a group in real-time.
     Search: Users can search for other users to chat with.
     Notifications: Users receive notifications if new messages are received and chat is not opened.
-    Video Calls: Users can make one-to-one as well as group video calls.
 
 Features
 
@@ -37,7 +36,6 @@ Features
     Real-Time Communication: Utilizes Socket.io for seamless real-time chat.
     User Authentication: Secure user authentication and data encryption.
     Search Functionality: Enables users to find others to chat with.
-    Video Calls: Facilitates video calls for enhanced communication.
 
 Contributing
 
