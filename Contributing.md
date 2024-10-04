@@ -4,7 +4,7 @@ Thank you for your interest in contributing to the Chamber of Secrets! We welcom
 
 ## Code of Conduct
 
-Please note that this project follows a [Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project, you agree to abide by its terms.
+Please note that this project follows a [Code of Conduct](Code_of_Conduct.md). By participating in this project, you agree to abide by its terms.
 
 ## How to Contribute
 
