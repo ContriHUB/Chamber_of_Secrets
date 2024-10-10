@@ -51,6 +51,7 @@ const SingleChat = ({fetchAgain,setFetchAgain}) => {
 
         // Mark the fetched messages as read
         markMessagesAsRead(data);
+
       } catch (error) {
         toast({
         title: "Error Occured!",
@@ -83,22 +84,20 @@ const SingleChat = ({fetchAgain,setFetchAgain}) => {
           // Give notification if not in the current chat
           if (!notification.includes(newMessageRecieved)) {
             setNotification([newMessageRecieved, ...notification]);
-            markMessageAsReceived(newMessageRecieved.chat._id); 
-            console.log('notif gyi!!!')
             setFetchAgain(!fetchAgain);
+            markMessageAsReceived(newMessageRecieved.chat._id); 
           }
         } else {
           // If in the current chat, add the message to messages and mark it as read
           setMessages([...messages, newMessageRecieved]);
           
           // Emit an event to mark the message as read in the backend
-          // markMessagesAsRead(newMessageRecieved.chat._id); 
+          markMessagesAsRead(newMessageRecieved.chat._id); 
         }
       });
     }, [messages, selectedChatCompare, notification]);
     
     const markMessageAsReceived = async () => {
-      // console.log('call hua');
       try {
         const config = {
           headers: {
@@ -156,15 +155,14 @@ const SingleChat = ({fetchAgain,setFetchAgain}) => {
       return () => {
         socket.off('messages updated');
       };
-    }, [selectedChatCompare]);
+    }, []);
 
 
     // to mark the message as received at the sender side:
     useEffect(() => {
       socket.on('messages received update', (data) => {
-        console.log("Challllaaa bhaiii !!!2")
 
-        if (selectedChatCompare._id === data.chatId) {
+        if (selectedChatCompare._id === data.chatId || notification) {
           // Mark all messages in the current chat as "received"
           setMessages((prevMessages) =>
             prevMessages.map((m) => ({ ...m, status: 'received' }))
@@ -175,7 +173,7 @@ const SingleChat = ({fetchAgain,setFetchAgain}) => {
       return () => {
         socket.off('messages received update');
       };
-    }, [selectedChatCompare,fetchAgain]);
+    }, [notification]);
 
 
     console.log(notification,"------------>")
