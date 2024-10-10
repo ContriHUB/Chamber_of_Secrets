@@ -80,7 +80,7 @@ const SingleChat = ({fetchAgain,setFetchAgain}) => {
     useEffect(() => {
       socket.on("message recieved", (newMessageRecieved) => {
         if (!selectedChatCompare || selectedChatCompare._id !== newMessageRecieved.chat._id) {
-          markMessageAsReceived(newMessageRecieved.chat._id); 
+          // markMessageAsReceived(newMessageRecieved.chat._id); 
           // Give notification if not in the current chat
           if (!notification.includes(newMessageRecieved)) {
             setNotification([newMessageRecieved, ...notification]);
@@ -173,7 +173,7 @@ const SingleChat = ({fetchAgain,setFetchAgain}) => {
       return () => {
         socket.off('messages received update');
       };
-    }, [notification]);
+    }, [selectedChatCompare,notification]);
 
 
     console.log(notification,"------------>")
