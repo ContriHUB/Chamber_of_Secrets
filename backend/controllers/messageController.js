@@ -19,6 +19,7 @@ const sendMessage=asyncHandler(async(req,res)=>{
 
     try {
         var message=await Message.create(newMessage)
+        message.status = 'delivered'
 
         message=await message.populate('sender','name profilePic')
         message=await message.populate('chat')
@@ -28,6 +29,7 @@ const sendMessage=asyncHandler(async(req,res)=>{
         })
 
         await Chat.findByIdAndUpdate(req.body.chatId,{latestMessage:message})
+        await message.save();
         res.json(message)
     } catch (error) {
         res.status(400)
@@ -40,6 +42,7 @@ const allMessages=asyncHandler(async(req,res)=>{
         const messages=await Message.find({chat:req.params.chatId})
             .populate("sender","name profilePic email")
             .populate("chat")
+
         res.json(messages)
     } catch (error) {
         res.status(400);
@@ -47,4 +50,40 @@ const allMessages=asyncHandler(async(req,res)=>{
     }
 })
 
-module.exports={sendMessage,allMessages}
+const markMessageAsReceived = asyncHandler(async (req, res) => {
+    try {
+      const { messageIds } = req.body;
+  
+      await Message.updateMany(
+        { _id: { $in: messageIds } }, 
+        { 
+            status: 'received'
+         } 
+      );
+  
+      console.log(res);
+      return res.status(200).json({ message: 'Messages marked as received' });
+    } catch (error) {
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+
+const markMessageAsRead = asyncHandler(async (req, res) => {
+    try {
+      const { messageIds } = req.body;
+  
+      await Message.updateMany(
+        { _id: { $in: messageIds } }, 
+        { readByReceiver: true,
+            status: 'read'
+         } 
+      );
+  
+      return res.status(200).json({ message: 'Messages marked as read' });
+    } catch (error) {
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+
+
+module.exports={sendMessage,allMessages,markMessageAsRead,markMessageAsReceived}

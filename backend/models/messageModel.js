@@ -13,6 +13,15 @@ const messageModel= mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"Chats"
     },
+    status: {
+        type: String,
+        enum: ['sending', 'delivered', 'read', 'received'],
+        default: 'sending'
+    },
+    readByReceiver: {
+        type: Boolean,
+        default: false 
+    }
 },
 {
     timestamps:true

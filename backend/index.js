@@ -7,6 +7,7 @@ const messageRoutes=require('./routes/messageRoutes.js')
 const chatRoutes=require('./routes/chatRoutes.js')
 const path = require('path');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware.js')
+const Message = require('./models/messageModel.js')
 dotenv.config()//This line invokes the config method of the dotenv module, which loads 
 //the variables from your .env file into process.env.
 ConnectDB()
@@ -72,6 +73,38 @@ io.on('connection',(socket)=>{
             socket.in(user._id).emit("message recieved",newMessageRecieved)
     })
     })
+
+    socket.on('messages read', async (chatId) => {
+      try {
+        // Update all unread messages in the specified chat as read
+        await Message.updateMany(
+          { chat: chatId, readByReceiver: false }, // Only update unread messages
+          { status:'read', readByReceiver: true }
+        );
+    
+        // Notify all users in the chat that the messages have been read
+        socket.in(chatId).emit('messages updated', { chatId });
+      } catch (error) {
+        console.error('Error updating messages read status:', error);
+      }
+    });
+
+    socket.on('messages received', async (chatId) => {
+      try {
+        // Update all messages in the specified chat as received
+        await Message.updateMany(
+          { chat: chatId }, // Only update unread messages
+          { status: 'received' }
+        );
+    
+        // Notify all users in the chat that the messages have been received
+        console.log('from backend emitting')
+        socket.in(chatId).emit('messages received update', { chatId });
+      } catch (error) {
+        console.error('Error updating messages received status:', error);
+      }
+    });
+
     socket.off("setup", () => {
     console.log("USER DISCONNECTED");
     socket.leave(userData._id);

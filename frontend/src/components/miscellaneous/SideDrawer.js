@@ -10,6 +10,8 @@ import { useToast } from '@chakra-ui/react'
 import { getSender } from '../../config/ChatLogics.js';
 import ChatLoading from "../ChatLoading";
 // import {Spinner} from "@chakra-ui/spinner"
+import NotificationBadge from "react-notification-badge";
+import { Effect } from "react-notification-badge";
 import { useNavigate } from 'react-router-dom'
 import {
   Drawer,
@@ -113,6 +115,10 @@ const SideDrawer = () => {
         <div>
           <Menu>
             <MenuButton p={1}>
+            <NotificationBadge
+            count={notification.length}
+            effect={Effect.SCALE}
+            />
               <BellIcon fontSize="2xl" m={1}/>
             </MenuButton>
             <MenuList pl={2}>

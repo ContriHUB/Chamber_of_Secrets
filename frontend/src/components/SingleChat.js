@@ -39,7 +39,7 @@ const SingleChat = ({fetchAgain,setFetchAgain}) => {
         const config = {
         headers: {
           Authorization: `Bearer ${user.token}`,
-        },
+        },  
       };
         setLoading(true)
         const {data}=await axios.get(`/api/message/${selectedChat._id}`,config)
@@ -48,6 +48,9 @@ const SingleChat = ({fetchAgain,setFetchAgain}) => {
         setLoading(false)
 
         socket.emit('join chat',selectedChat._id)
+
+        // Mark the fetched messages as read
+        markMessagesAsRead(data);
       } catch (error) {
         toast({
         title: "Error Occured!",
@@ -73,21 +76,110 @@ const SingleChat = ({fetchAgain,setFetchAgain}) => {
       selectedChatCompare=selectedChat;
     },[selectedChat])
 
-    useEffect(()=>{
-      socket.on("message recieved",(newMessageRecieved)=>{
-        if(!selectedChatCompare||selectedChatCompare._id!==newMessageRecieved.chat._id){
-          //give notification
+    useEffect(() => {
+      socket.on("message recieved", (newMessageRecieved) => {
+        if (!selectedChatCompare || selectedChatCompare._id !== newMessageRecieved.chat._id) {
+          markMessageAsReceived(newMessageRecieved.chat._id); 
+          // Give notification if not in the current chat
           if (!notification.includes(newMessageRecieved)) {
-          setNotification([newMessageRecieved, ...notification]);
-          setFetchAgain(!fetchAgain);
+            setNotification([newMessageRecieved, ...notification]);
+            markMessageAsReceived(newMessageRecieved.chat._id); 
+            console.log('notif gyi!!!')
+            setFetchAgain(!fetchAgain);
+          }
+        } else {
+          // If in the current chat, add the message to messages and mark it as read
+          setMessages([...messages, newMessageRecieved]);
+          
+          // Emit an event to mark the message as read in the backend
+          // markMessagesAsRead(newMessageRecieved.chat._id); 
         }
+      });
+    }, [messages, selectedChatCompare, notification]);
+    
+    const markMessageAsReceived = async () => {
+      // console.log('call hua');
+      try {
+        const config = {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        };
+    
+        // Send request to mark all messages in this chat as "received"
+        const messageIds = messages.map(m => m._id); 
+        const response = await axios.put(`/api/message/received`, { messageIds }, config);
+
+        // to the server
+        if (response.status === 200) { 
+          console.log('received');
+          socket.emit('messages received', selectedChat._id);
         }
-        else{
-          setMessages([...messages,newMessageRecieved])
+      } catch (error) {
+        console.error("Failed to mark messages as received", error);
+      }
+    }; 
+
+    const markMessagesAsRead = async () => {
+      try {
+        const config = {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        };
+    
+        // Send request to mark all messages in this chat as "read"
+        const messageIds = messages.map(m => m._id); 
+        const response = await axios.put(`/api/message/read`, { messageIds }, config);
+
+        // to the server
+        if (response.status === 200) { 
+          socket.emit('messages read', selectedChat._id);
         }
-      })
-    })
+      } catch (error) {
+        console.error("Failed to mark messages as read", error);
+      }
+    };
+
+    // to mark the message as read at the sender side:
+    useEffect(() => {
+      socket.on('messages updated', (data) => {
+
+        if (selectedChatCompare._id === data.chatId) {
+          // Mark all messages in the current chat as "read"
+          setMessages((prevMessages) =>
+            prevMessages.map((m) => ({ ...m, status: 'read', readByReceiver: true }))
+          );
+        }
+      });
+    
+      return () => {
+        socket.off('messages updated');
+      };
+    }, [selectedChatCompare]);
+
+
+    // to mark the message as received at the sender side:
+    useEffect(() => {
+      socket.on('messages received update', (data) => {
+        console.log("Challllaaa bhaiii !!!2")
+
+        if (selectedChatCompare._id === data.chatId) {
+          // Mark all messages in the current chat as "received"
+          setMessages((prevMessages) =>
+            prevMessages.map((m) => ({ ...m, status: 'received' }))
+          );
+        }
+      });
+    
+      return () => {
+        socket.off('messages received update');
+      };
+    }, [selectedChatCompare,fetchAgain]);
+
+
     console.log(notification,"------------>")
+
     const sendMessage=async(event)=>{
       if (event.key==='Enter'&&newMessage){
         socket.emit("stop typing", selectedChat._id);
