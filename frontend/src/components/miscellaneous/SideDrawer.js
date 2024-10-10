@@ -10,6 +10,8 @@ import { useToast } from '@chakra-ui/react'
 import { getSender } from '../../config/ChatLogics.js';
 import ChatLoading from "../ChatLoading";
 // import {Spinner} from "@chakra-ui/spinner"
+import NotificationBadge from "react-notification-badge";
+import { Effect } from "react-notification-badge";
 import { useNavigate } from 'react-router-dom'
 import {
   Drawer,
@@ -57,7 +59,7 @@ const SideDrawer = () => {
           },
         }
 
-        const {data}=await axios.get(`/api/user?search=${search}`,config)
+        const {data}=await axios.get(`/api/user/register?search=${search}`,config)
         //a GET request to an endpoint (/api/user) with a query parameter search, which likely contains the search term.
         setLoading(false)
         setSearchResults(data)
@@ -113,6 +115,10 @@ const SideDrawer = () => {
         <div>
           <Menu>
             <MenuButton p={1}>
+            <NotificationBadge
+            count={notification.length}
+            effect={Effect.SCALE}
+            />
               <BellIcon fontSize="2xl" m={1}/>
             </MenuButton>
             <MenuList pl={2}>
