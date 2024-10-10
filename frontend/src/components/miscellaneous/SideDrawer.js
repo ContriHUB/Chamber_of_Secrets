@@ -57,7 +57,7 @@ const SideDrawer = () => {
           },
         }
 
-        const {data}=await axios.get(`/api/user?search=${search}`,config)
+        const {data}=await axios.get(`/api/user/register?search=${search}`,config)
         //a GET request to an endpoint (/api/user) with a query parameter search, which likely contains the search term.
         setLoading(false)
         setSearchResults(data)
