@@ -81,8 +81,9 @@ const Signup = () => {
             "Content-Type":"application/json",
           },
         };
-
+        console.log({ name, email, password ,profilePic});
         const { data } = await axios.post("/api/user/register",{name,email,password,profilePic},config);
+        //console.log(data);
         toast({
           title: "User Successfully Registered",
           status: "success",
@@ -96,6 +97,10 @@ const Signup = () => {
         // Get the navigate function
     navigate("/"); 
       } catch (error){
+        console.error("Error caught:", error); // Log the entire error object
+        const errorMessage = error.response && error.response.data && error.response.data.message 
+                             ? error.response.data.message 
+                             : "Server error"; // Fallback message
         toast({
           title: "Error Occured!",
           description:error.response.data.message,
