@@ -142,4 +142,15 @@ const allUsers=asyncHandler(async(req,res)=>{
     res.send(users)
 })
 
-module.exports={registerUser,authUser,allUsers,verifyEmail}
+//last seen
+const updateLastSeen = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        await User.findByIdAndUpdate(userId, { lastSeen: Date.now() }, { new: true });
+        res.status(200).json({ message: "Last seen updated" });
+    } catch (error) {
+        res.status(500).json({ message: "Error updating last seen" });
+    }
+};
+
+module.exports={registerUser,authUser,allUsers,verifyEmail,updateLastSeen}

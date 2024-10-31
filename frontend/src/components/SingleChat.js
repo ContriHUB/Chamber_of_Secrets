@@ -64,10 +64,30 @@ const SingleChat = ({fetchAgain,setFetchAgain}) => {
       }
     }
 
+
+    const updateLastSeen = async () => {
+      try {
+          const config = {
+              headers: {
+                  Authorization: `Bearer ${user.token}`,
+                  "Content-Type": "application/json"
+              }
+          };
+          await axios.put(`/api/user/lastSeen/${user._id}`, {}, config);
+      } catch (error) {
+          console.error("Failed to update lastSeen:", error);
+      }
+    };
+
+
     useEffect(()=>{
       socket=io(ENDPOINT)
       socket.emit("setup",user)
-      socket.on("connected",()=>setsocketConnected(true))
+      socket.on("connected",()=>{
+        setsocketConnected(true);
+        updateLastSeen(); // Update lastSeen when socket connects
+
+    })
       socket.on("typing",()=>setIsTyping(true))
       socket.on("stop typing",()=>setIsTyping(false))
     },[])
@@ -200,6 +220,7 @@ const SingleChat = ({fetchAgain,setFetchAgain}) => {
           //console.log(data)
           socket.emit('new message',data)
           setMessages([...messages,data])
+          updateLastSeen(); // Update lastSeen after sending a message
         } catch (error) {
           toast({
           title: "Error Occured!",

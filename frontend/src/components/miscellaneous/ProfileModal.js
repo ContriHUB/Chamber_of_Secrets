@@ -55,6 +55,12 @@ const ProfileModal = ({user,children}) => {
             >
               Email: {user.email}
             </Text>
+            <Text color="blue.500">
+              Last Seen:{" "}
+              {user.lastSeen
+                ? new Date(user.lastSeen).toLocaleString()
+                : "Offline"}
+            </Text>
           </ModalBody>
           <ModalFooter>
             <Button onClick={onClose}>Close</Button>
